@@ -1,5 +1,7 @@
 <?php
-class MinecraftProfile {
+
+class MinecraftProfile
+{
     private $username;
     private $uuid;
     private $properties;
@@ -9,7 +11,8 @@ class MinecraftProfile {
      * @param string $uuid The player's UUID.
      * @param array $properties The player's properties specified on their Mojang profile.
      */
-    function __CONSTRUCT($username, $uuid, $properties = array()) {
+    function __CONSTRUCT($username, $uuid, $properties = array())
+    {
         $this->username = $username;
         $this->uuid = $uuid;
         $this->properties = $properties;
@@ -18,57 +21,63 @@ class MinecraftProfile {
     /**
      * @return string The player's username.
      */
-    public function getUsername() {
+    public function getUsername()
+    {
         return $this->username;
     }
 
     /**
      * @return string The player's UUID.
      */
-    public function getUUID() {
+    public function getUUID()
+    {
         return $this->uuid;
     }
 
     /**
      * @return array The player's properties listed on their mojang profile.
      */
-    public function getProperties() {
+    public function getProperties()
+    {
         return $this->properties;
     }
 
     /**
      * @return array Returns an array with keys of 'properties, usernname and uuid'.
      */
-    public function getProfileAsArray() {
+    public function getProfileAsArray()
+    {
         return array("username" => $this->username, "uuid" => $this->uuid, "properties" => $this->properties);
     }
 }
 
-class ProfileUtils {
+class ProfileUtils
+{
     /**
      * @param string $identifier Either the player's Username or UUID.
      * @param int $timeout The length in seconds of the http request timeout.
      * @return MinecraftProfile|null Returns null if fetching of profile failed. Else returns completed user profile.
      */
-    public static function getProfile($identifier, $timeout = 5) {
-        if(strlen($identifier) <= 16){
+    public static function getProfile($identifier, $timeout = 5)
+    {
+        if (strlen($identifier) <= 16) {
             $identifier = ProfileUtils::getUUIDFromUsername($identifier, $timeout);
-            $url = "https://sessionserver.mojang.com/session/minecraft/profile/".$identifier['uuid'];
+            $url = "https://sessionserver.mojang.com/session/minecraft/profile/" . $identifier['uuid'];
         } else {
-            $url = "https://sessionserver.mojang.com/session/minecraft/profile/".$identifier;
+            $url = "https://sessionserver.mojang.com/session/minecraft/profile/" . $identifier;
         }
         $ctx = stream_context_create(
-        	array(
-            	'http' => array(
-                	'timeout' => $timeout
-				      )
+            array(
+                'http' => array(
+                    'timeout' => $timeout
+                )
             )
         );
         $ret = file_get_contents($url, 0, $ctx);
-        if(isset($ret) && $ret != null && $ret != false) {
+        if (isset($ret) && $ret != null && $ret != false) {
             $data = json_decode($ret, true);
             return new MinecraftProfile($data['name'], $data['id'], $data['properties']);
-        }else {
+        } else {
             return null;
         }
     }
@@ -78,30 +87,29 @@ class ProfileUtils {
      * @param $username string Minecraft username.
      * @return array (Key => Value) "username" => Minecraft username (properly capitalized) "uuid" => Minecraft UUID
      */
-    public static function getUUIDFromUsername($username, $timeout = 5) {
-        if(strlen($username) > 16)
+    public static function getUUIDFromUsername($username, $timeout = 5)
+    {
+        if (strlen($username) > 16)
             return array("username" => "", "uuid" => "");
         $url = 'https://api.mojang.com/profiles/minecraft';
         $options = array(
             'http' => array(
-                'header'  => "Content-type: application/json\r\n",
-                'method'  => 'POST',
-                'content' => '["'.$username.'"]',
+                'header' => "Content-type: application/json\r\n",
+                'method' => 'POST',
+                'content' => '["' . $username . '"]',
                 'timeout' => $timeout
             ),
         );
-        $context  = stream_context_create($options);
+        $context = stream_context_create($options);
         $result = file_get_contents($url, false, $context);
 
         // Verification
-        if(isset($result) && $result != null && $result != false)
-        {
+        if (isset($result) && $result != null && $result != false) {
             $ress = json_decode($result, true);
             $ress = $ress[0];
-            $res = Array("username" =>  $ress['name'], "uuid" => $ress['id']);
+            $res = array("username" => $ress['name'], "uuid" => $ress['id']);
             return $res;
-        }
-        else
+        } else
             return null;
     }
 
@@ -110,17 +118,18 @@ class ProfileUtils {
      * @param int $timeout http timeout in seconds
      * @return array of array (Key => Value) "username" => Minecraft username (properly capitalized) "uuid" => Minecraft UUID
      */
-    public static function getUUIDsFromUsernames($usernames, $timeout = 5){
+    public static function getUUIDsFromUsernames($usernames, $timeout = 5)
+    {
         $usernames = array_splice($usernames, 0, 100);
-        foreach($usernames as $user)
-            if(strlen($user) > 16)
+        foreach ($usernames as $user)
+            if (strlen($user) > 16)
                 return array("username" => "", "uuid" => "");
 
         $url = 'https://api.mojang.com/profiles/minecraft';
         $first = true;
         $contents = "[";
         foreach ($usernames as $user) {
-            if(!$first) {
+            if (!$first) {
                 $contents .= ", ";
             }
             $contents .= '"' . $user . '"';
@@ -130,43 +139,42 @@ class ProfileUtils {
 
         $options = array(
             'http' => array(
-                'header'  => "Content-type: application/json\r\n",
-                'method'  => 'POST',
+                'header' => "Content-type: application/json\r\n",
+                'method' => 'POST',
                 'content' => $contents,
                 'timeout' => $timeout
             )
         );
 
-        $context  = stream_context_create($options);
+        $context = stream_context_create($options);
         $result = file_get_contents($url, false, $context);
 
         // Verification
-        if(isset($result) && $result != null && $result != false)
-        {
+        if (isset($result) && $result != null && $result != false) {
             $output = array();
             $ress = json_decode($result, true);
-            for($i = 0; $i < count($ress); $i++){
+            for ($i = 0; $i < count($ress); $i++) {
                 $ress = $ress[$i];
-                $res = Array("username" =>  $ress['name'], "uuid" => $ress['id']);
+                $res = array("username" => $ress['name'], "uuid" => $ress['id']);
                 array_push($output, $res);
             }
 
             return $output;
-        }
-        else
+        } else
             return null;
     }
 
     /**
-    * @param $uuid string UUID to format
-    * @return string Properly formatted UUID (According to UUID v4 Standards xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx WHERE y = 8,9,A,or B and x = random digits.)
-    */
-    public static function formatUUID($uuid) {
+     * @param $uuid string UUID to format
+     * @return string Properly formatted UUID (According to UUID v4 Standards xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx WHERE y = 8,9,A,or B and x = random digits.)
+     */
+    public static function formatUUID($uuid)
+    {
         $uid = "";
-        $uid .= substr($uuid, 0, 8)."-";
-        $uid .= substr($uuid, 8, 4)."-";
-        $uid .= substr($uuid, 12, 4)."-";
-        $uid .= substr($uuid, 16, 4)."-";
+        $uid .= substr($uuid, 0, 8) . "-";
+        $uid .= substr($uuid, 8, 4) . "-";
+        $uid .= substr($uuid, 12, 4) . "-";
+        $uid .= substr($uuid, 16, 4) . "-";
         $uid .= substr($uuid, 20);
         return $uid;
     }
