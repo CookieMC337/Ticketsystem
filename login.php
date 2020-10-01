@@ -7,9 +7,7 @@ session_start();
 require("datamanager.php");
 require('assets/languages/lang_'.getSetting("lang").'.php');
 if(isset($_SESSION["username"])){
-  ?>
-  <meta http-equiv="refresh" content="0; URL=index.php">
-  <?php
+  header("Location: index.php");
   exit;
 }
  ?>
@@ -42,9 +40,7 @@ if(isset($_SESSION["username"])){
             if(password_verify($_POST["pw"], $row["PASSWORD"])){
               $_SESSION["username"] = $row["USERNAME"];
               updateLogin($_SESSION["username"]);
-              ?>
-              <meta http-equiv="refresh" content="0; URL=index.php">
-              <?php
+              header("Location: index.php");
               exit;
             } else {
               ?>

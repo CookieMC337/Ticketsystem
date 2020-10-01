@@ -7,9 +7,7 @@ session_start();
 require("datamanager.php");
 require('assets/languages/lang_'.getSetting("lang").'.php');
 if(!isset($_SESSION["username"])){
-  ?>
-  <meta http-equiv="refresh" content="0; URL=login.php">
-  <?php
+  header("Location: login.php");
   exit;
 }
 function create(){
@@ -24,9 +22,7 @@ function create(){
   $now = time();
   $stmt->bindParam(":now", $now, PDO::PARAM_STR);
   $stmt->execute();
-  ?>
-  <meta http-equiv="refresh" content="0; URL=mytickets.php">
-  <?php
+  header("Location: mytickets.php");
 }
  ?>
 <!DOCTYPE html>

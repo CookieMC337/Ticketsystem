@@ -7,15 +7,11 @@ session_start();
 require("datamanager.php");
 require('assets/languages/lang_'.getSetting("lang").'.php');
 if(!isset($_SESSION["username"])){
-  ?>
-  <meta http-equiv="refresh" content="0; URL=login.php">
-  <?php
-  exit;
+    header("Location: login.php");
+    exit;
 } else if(getAccountRank($_SESSION["username"]) < 3){
-  ?>
-  <meta http-equiv="refresh" content="0; URL=mytickets.php">
-  <?php
-  exit;
+    header("Location: mytickets.php");
+    exit;
 }
  ?>
 <!DOCTYPE html>

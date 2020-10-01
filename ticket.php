@@ -7,14 +7,10 @@ session_start();
 require("datamanager.php");
 require('assets/languages/lang_'.getSetting("lang").'.php');
 if(!isset($_SESSION["username"])){
-  ?>
-  <meta http-equiv="refresh" content="0; URL=login.php">
-  <?php
+    header("Location: login.php");
   exit;
 } else if(getAccountRank($_SESSION["username"]) == 0 || $_SESSION["username"] != getAccountName(getTicketCreatorID($_GET["id"]))){
-  ?>
-  <meta http-equiv="refresh" content="0; URL=mytickets.php">
-  <?php
+    header("Location: mytickets.php");
   exit;
 }
  ?>
