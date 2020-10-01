@@ -86,4 +86,3 @@ define("SAVED_CHANGE", "Deine Änderungen wurden gespeichert.");
 define("EDIT_NO_PERMS", "Du kannst diesen Benutzer nicht verändern.");
 define("EDIT_NOT_YOU", "Du kannst dich nicht selbst bearbeiten.");
 define("NO_REQUEST", "Es wurde kein Benutzer angefordert.");
- ?>
